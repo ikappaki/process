@@ -101,9 +101,13 @@
         exit-code (:exit proc)
         err (:err proc)]
     (if (not (zero? exit-code))
-      (let [err (if (string? err)
+      (let [err (cond
+                  (string? err)
                   err
-                  (slurp (:err proc)))]
+                  (instance? java.io.InputStream err)
+                  (slurp err)
+                  :else
+                  err)]
         (throw (ex-info (if (string? err)
                           err
                           "failed")
